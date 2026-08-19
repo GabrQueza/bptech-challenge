@@ -139,9 +139,18 @@ export const DashboardPage = () => {
   };
 
   const filteredReservations = reservations.filter((res) => {
-    const matchDate = filterDate ? res.date.startsWith(filterDate) : true;
-    const matchRoom = filterRoom ? res.roomId.toLowerCase().includes(filterRoom.toLowerCase()) : true;
-    const matchUser = filterUser ? res.user?.name.toLowerCase().includes(filterUser.toLowerCase()) : true;
+    // Para a data, vamos converter a data do banco (UTC) para o fuso local em formato YYYY-MM-DD (en-CA).
+    // Assim, se o display mostra 8/24, o filtro também vai bater com 8/24.
+    const localDateStr = new Date(res.date).toLocaleDateString('en-CA'); 
+    const matchDate = filterDate ? localDateStr === filterDate : true;
+    
+    // Tratamento ultra-seguro para strings
+    const safeRoomId = res.roomId ? String(res.roomId).toLowerCase() : '';
+    const matchRoom = filterRoom ? safeRoomId.includes(filterRoom.toLowerCase()) : true;
+    
+    const safeUserName = res.user?.name ? String(res.user.name).toLowerCase() : String(res.userId || '').toLowerCase();
+    const matchUser = filterUser ? safeUserName.includes(filterUser.toLowerCase()) : true;
+    
     return matchDate && matchRoom && matchUser;
   });
 
