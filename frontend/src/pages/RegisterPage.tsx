@@ -27,8 +27,8 @@ export const RegisterPage = () => {
     e.preventDefault();
     if (!name || !email || !password) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all fields.',
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -38,8 +38,8 @@ export const RegisterPage = () => {
 
     if (password.length < 6) {
       toast({
-        title: 'Error',
-        description: 'Password must be at least 6 characters.',
+        title: 'Erro',
+        description: 'A senha deve ter pelo menos 6 caracteres.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -53,8 +53,8 @@ export const RegisterPage = () => {
       console.log('✅ Account created successfully!', response.data);
       
       toast({
-        title: 'Success',
-        description: 'Account created successfully!',
+        title: 'Sucesso',
+        description: 'Conta criada com sucesso!',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -62,7 +62,7 @@ export const RegisterPage = () => {
       navigate('/login');
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: 'Erro',
         description: error.response?.data?.message || 'Erro de conexão',
         status: 'error',
         duration: 3000,
@@ -74,53 +74,63 @@ export const RegisterPage = () => {
   };
 
   return (
-    <Container centerContent py={10}>
-      <Box w="full" maxW="md" p={8} borderWidth={1} borderRadius="lg" boxShadow="lg">
-        <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
-          <Heading textAlign="center" size="lg">Register</Heading>
+    <Box minH="100vh" w="100%" bg="gray.50" py={10} px={4}>
+      <Container centerContent>
+        <Box w="full" maxW="md" p={8} borderRadius="xl" boxShadow="lg" bg="white">
+          <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
+            <Heading textAlign="center" size="lg" color="blue.900">Cadastrar</Heading>
           
           <FormControl isRequired>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>Nome</FormLabel>
             <Input 
               type="text" 
-              placeholder="Enter your name" 
+              placeholder="Digite seu nome" 
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>E-mail</FormLabel>
             <Input 
               type="email" 
-              placeholder="Enter your email" 
+              placeholder="Digite seu e-mail" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
           
           <FormControl isRequired>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>Senha</FormLabel>
             <Input 
               type="password" 
-              placeholder="Enter your password" 
+              placeholder="Digite sua senha" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </FormControl>
           
-          <Button colorScheme="blue" size="lg" type="submit" mt={4} isLoading={isLoading}>
-            Sign Up
+          <Button 
+            colorScheme="blue" 
+            size="lg" 
+            type="submit" 
+            mt={4} 
+            isLoading={isLoading}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
+            Cadastrar
           </Button>
           
           <Text textAlign="center">
-            Already have an account?{' '}
+            Já tem uma conta?{' '}
             <Link as={RouterLink} to="/login" color="blue.500">
-              Login here
+              Entre aqui
             </Link>
           </Text>
         </VStack>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </Box>
   );
 };

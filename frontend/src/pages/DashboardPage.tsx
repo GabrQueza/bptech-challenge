@@ -10,6 +10,7 @@ import {
   Th,
   Td,
   HStack,
+  Stack,
   Input,
   VStack,
   Button,
@@ -37,6 +38,11 @@ import {
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
+import DatePicker from 'react-datepicker';
+import { ptBR } from 'date-fns/locale';
+import { format } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+
 const pad = (n: number) => n.toString().padStart(2, '0');
 const toLocalYYYYMMDD = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
@@ -44,7 +50,7 @@ export const DashboardPage = () => {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const [filterDate, setFilterDate] = useState('');
+  const [filterDate, setFilterDate] = useState<Date | null>(null);
   const [filterRoom, setFilterRoom] = useState('');
   const [filterUser, setFilterUser] = useState('');
 
@@ -57,7 +63,7 @@ export const DashboardPage = () => {
   const [currentReservationId, setCurrentReservationId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     roomId: '',
-    date: '',
+    date: null as Date | null,
     startTime: '',
     endTime: ''
   });
@@ -75,7 +81,7 @@ export const DashboardPage = () => {
       setReservations(response.data);
     } catch (error) {
       toast({
-        title: 'Error fetching reservations',
+        title: 'Erro ao buscar reservas',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -97,7 +103,7 @@ export const DashboardPage = () => {
   const handleOpenCreate = () => {
     setIsEditing(false);
     setCurrentReservationId(null);
-    setFormData({ roomId: '', date: '', startTime: '', endTime: '' });
+    setFormData({ roomId: '', date: null, startTime: '', endTime: '' });
     onOpen();
   };
 
@@ -112,7 +118,7 @@ export const DashboardPage = () => {
     
     setFormData({
       roomId: res.roomId,
-      date: toLocalYYYYMMDD(dObj),
+      date: dObj,
       startTime: `${pad(sObj.getHours())}:${pad(sObj.getMinutes())}`,
       endTime: `${pad(eObj.getHours())}:${pad(eObj.getMinutes())}`,
     });
@@ -121,29 +127,35 @@ export const DashboardPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.date) {
+      toast({ title: 'Erro', description: 'Por favor, selecione uma data válida.', status: 'error', duration: 3000, isClosable: true });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      const dateStr = format(formData.date, 'yyyy-MM-dd');
       const payload = {
         roomId: formData.roomId,
-        date: new Date(`${formData.date}T00:00:00`).toISOString(),
-        startTime: new Date(`${formData.date}T${formData.startTime}:00`).toISOString(),
-        endTime: new Date(`${formData.date}T${formData.endTime}:00`).toISOString(),
+        date: new Date(`${dateStr}T00:00:00`).toISOString(),
+        startTime: new Date(`${dateStr}T${formData.startTime}:00`).toISOString(),
+        endTime: new Date(`${dateStr}T${formData.endTime}:00`).toISOString(),
       };
 
       if (isEditing && currentReservationId) {
         await api.patch(`/reservations/${currentReservationId}`, payload);
-        toast({ title: 'Success', description: 'Reservation updated!', status: 'success', duration: 3000, isClosable: true });
+        toast({ title: 'Sucesso', description: 'Reserva atualizada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       } else {
         await api.post('/reservations', payload);
-        toast({ title: 'Success', description: 'Reservation created!', status: 'success', duration: 3000, isClosable: true });
+        toast({ title: 'Sucesso', description: 'Reserva criada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       }
       
       onClose();
       fetchReservations();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Error saving reservation',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro ao salvar reserva',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -163,13 +175,13 @@ export const DashboardPage = () => {
     setIsSubmitting(true);
     try {
       await api.delete(`/reservations/${reservationToDelete}`);
-      toast({ title: 'Success', description: 'Reservation cancelled!', status: 'success', duration: 3000, isClosable: true });
+      toast({ title: 'Sucesso', description: 'Reserva cancelada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       fetchReservations();
       onDeleteClose();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Error deleting reservation',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro ao excluir reserva',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -182,7 +194,8 @@ export const DashboardPage = () => {
 
   const filteredReservations = reservations.filter((res) => {
     const localDateStr = toLocalYYYYMMDD(new Date(res.date)); 
-    const matchDate = filterDate ? localDateStr === filterDate : true;
+    const filterDateStr = filterDate ? format(filterDate, 'yyyy-MM-dd') : '';
+    const matchDate = filterDateStr ? localDateStr === filterDateStr : true;
     
     const safeRoomId = res.roomId ? String(res.roomId).toLowerCase() : '';
     const matchRoom = filterRoom ? safeRoomId === filterRoom.toLowerCase() : true;
@@ -194,72 +207,100 @@ export const DashboardPage = () => {
   });
 
   const handleResetFilters = () => {
-    setFilterDate('');
+    setFilterDate(null);
     setFilterRoom('');
     setFilterUser('');
   };
 
   return (
-    <Container maxW="container.xl" py={10}>
-      <Flex justifyContent="space-between" alignItems="center" mb={8}>
-        <Heading>Reservations Dashboard</Heading>
-        <HStack>
-          <Button colorScheme="green" onClick={handleOpenCreate}>New Reservation</Button>
-          <Button colorScheme="red" onClick={handleLogout}>Logout</Button>
+    <Box minH="100vh" bg="gray.50" py={10}>
+      <Container maxW="container.xl">
+        <Flex direction={{ base: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" mb={8} gap={{ base: 4, md: 0 }}>
+          <Heading color="blue.900" textAlign={{ base: 'center', md: 'left' }}>Painel de Reservas</Heading>
+        <HStack w={{ base: '100%', md: 'auto' }} justifyContent={{ base: 'center', md: 'flex-start' }}>
+          <Button 
+            colorScheme="green" 
+            onClick={handleOpenCreate}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
+            Nova Reserva
+          </Button>
+          <Button 
+            colorScheme="red" 
+            onClick={handleLogout}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
+            Sair
+          </Button>
         </HStack>
       </Flex>
 
-      <Box p={6} borderWidth={1} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
+      <Box p={6} borderRadius="xl" boxShadow="lg" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
           <Flex justifyContent="space-between" alignItems="center">
-            <Text fontWeight="bold">Filters</Text>
-            <Button size="sm" onClick={handleResetFilters}>Reset Filters</Button>
+            <Text fontWeight="bold" color="gray.700">Filtros</Text>
+            <Button 
+              size="sm" 
+              onClick={handleResetFilters}
+              _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+              transition="all 0.2s"
+            >
+              Limpar Filtros
+            </Button>
           </Flex>
-          <HStack spacing={4}>
-            <Input 
-              type="date" 
-              placeholder="Filter by Date" 
-              value={filterDate} 
-              onChange={(e) => setFilterDate(e.target.value)}
-            />
+          <Stack direction={{ base: 'column', md: 'row' }} spacing={4} w="100%">
+            <Box w="full">
+              <DatePicker 
+                selected={filterDate}
+                onChange={(date: Date | null) => setFilterDate(date)}
+                locale={ptBR}
+                dateFormat="dd/MM/yyyy"
+                customInput={<Input placeholder="Filtrar por Data" w="full" />}
+                placeholderText="Filtrar por Data"
+              />
+            </Box>
             <Select 
-              placeholder="Select Room" 
+              placeholder="Selecionar Sala" 
               value={filterRoom} 
               onChange={(e) => setFilterRoom(e.target.value)}
+              w="full"
             >
               <option value="sala-a">sala-a</option>
               <option value="sala-b">sala-b</option>
               <option value="sala-c">sala-c</option>
             </Select>
             <Input 
-              placeholder="Filter by User Name" 
+              placeholder="Filtrar por Nome de Usuário" 
               value={filterUser} 
               onChange={(e) => setFilterUser(e.target.value)}
+              w="full"
             />
-          </HStack>
+          </Stack>
         </VStack>
       </Box>
 
-      <Box overflowX="auto" borderWidth={1} borderRadius="lg" boxShadow="md" bg="white">
+      <Box overflowX="auto" w="100%" borderRadius="xl" boxShadow="lg" bg="white" p={6}>
         <Table variant="simple">
           <Thead bg="gray.50">
             <Tr>
-              <Th>Date</Th>
-              <Th>Room</Th>
-              <Th>Start Time</Th>
-              <Th>End Time</Th>
-              <Th>User</Th>
-              <Th>Actions</Th>
+              <Th>Data</Th>
+              <Th>Sala</Th>
+              <Th>Início</Th>
+              <Th>Término</Th>
+              <Th>Usuário</Th>
+              <Th>Ações</Th>
             </Tr>
           </Thead>
           <Tbody>
             {isLoading ? (
               <Tr>
-                <Td colSpan={6} textAlign="center">Loading...</Td>
+                <Td colSpan={6} textAlign="center">Carregando...</Td>
               </Tr>
             ) : filteredReservations.length === 0 ? (
               <Tr>
-                <Td colSpan={6} textAlign="center">No reservations found.</Td>
+                <Td colSpan={6} textAlign="center">Nenhuma reserva encontrada.</Td>
               </Tr>
             ) : (
               filteredReservations.map((res) => (
@@ -271,11 +312,23 @@ export const DashboardPage = () => {
                   <Td>{res.user?.name || res.userId}</Td>
                   <Td>
                     <HStack spacing={2}>
-                      <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
-                        Edit
+                      <Button 
+                        size="sm" 
+                        colorScheme="blue" 
+                        onClick={() => handleOpenEdit(res)}
+                        _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                        transition="all 0.2s"
+                      >
+                        Editar
                       </Button>
-                      <Button size="sm" colorScheme="red" onClick={() => confirmDelete(res.id)}>
-                        Delete
+                      <Button 
+                        size="sm" 
+                        colorScheme="red" 
+                        onClick={() => confirmDelete(res.id)}
+                        _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                        transition="all 0.2s"
+                      >
+                        Excluir
                       </Button>
                     </HStack>
                   </Td>
@@ -290,14 +343,14 @@ export const DashboardPage = () => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit}>
-          <ModalHeader>{isEditing ? 'Edit Reservation' : 'New Reservation'}</ModalHeader>
+          <ModalHeader>{isEditing ? 'Editar Reserva' : 'Nova Reserva'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel>Room ID</FormLabel>
+                <FormLabel>Sala</FormLabel>
                 <Select 
-                  placeholder="Select a room" 
+                  placeholder="Selecione uma sala" 
                   value={formData.roomId} 
                   onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
                 >
@@ -307,16 +360,20 @@ export const DashboardPage = () => {
                 </Select>
               </FormControl>
               <FormControl isRequired>
-                <FormLabel>Date</FormLabel>
-                <Input 
-                  type="date" 
-                  value={formData.date} 
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
-                />
+                <FormLabel>Data</FormLabel>
+                <Box w="full">
+                  <DatePicker 
+                    selected={formData.date}
+                    onChange={(date: Date | null) => setFormData({ ...formData, date })}
+                    locale={ptBR}
+                    dateFormat="dd/MM/yyyy"
+                    customInput={<Input placeholder="Selecione uma data" w="full" />}
+                  />
+                </Box>
               </FormControl>
               <HStack w="full">
                 <FormControl isRequired>
-                  <FormLabel>Start Time</FormLabel>
+                  <FormLabel>Horário de Início</FormLabel>
                   <Input 
                     type="time" 
                     value={formData.startTime} 
@@ -324,7 +381,7 @@ export const DashboardPage = () => {
                   />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel>End Time</FormLabel>
+                  <FormLabel>Horário de Término</FormLabel>
                   <Input 
                     type="time" 
                     value={formData.endTime} 
@@ -335,9 +392,17 @@ export const DashboardPage = () => {
             </VStack>
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
-            <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
-              Save
+            <Button variant="ghost" mr={3} onClick={onClose} _hover={{ bg: 'gray.100' }}>
+              Cancelar
+            </Button>
+            <Button 
+              colorScheme="blue" 
+              type="submit" 
+              isLoading={isSubmitting}
+              _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+              transition="all 0.2s"
+            >
+              Salvar
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -352,25 +417,33 @@ export const DashboardPage = () => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Cancel Reservation
+              Cancelar Reserva
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure? You can't undo this action afterwards.
+              Tem certeza? Esta ação não pode ser desfeita.
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
-                No, keep it
+              <Button ref={cancelRef} onClick={onDeleteClose} _hover={{ bg: 'gray.100' }}>
+                Não, manter
               </Button>
-              <Button colorScheme="red" onClick={executeDelete} ml={3} isLoading={isSubmitting}>
-                Yes, cancel it
+              <Button 
+                colorScheme="red" 
+                onClick={executeDelete} 
+                ml={3} 
+                isLoading={isSubmitting}
+                _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                transition="all 0.2s"
+              >
+                Sim, cancelar
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
 
-    </Container>
+      </Container>
+    </Box>
   );
 };

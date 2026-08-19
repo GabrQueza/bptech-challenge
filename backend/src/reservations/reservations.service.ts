@@ -10,14 +10,14 @@ export class ReservationsService {
     
     // 1. Não pode ocorrer no passado
     if (startTime < now) {
-      throw new BadRequestException('Reservation cannot be in the past');
+      throw new BadRequestException('A reserva não pode ocorrer no passado');
     }
 
     // 2. Duração mínima de 1 hora
     const durationMs = endTime.getTime() - startTime.getTime();
     const oneHourMs = 60 * 60 * 1000;
     if (durationMs < oneHourMs) {
-      throw new BadRequestException('Reservation must be at least 1 hour long');
+      throw new BadRequestException('A reserva deve ter duração mínima de 1 hora');
     }
 
     // 3. Checar sobreposição de horários
@@ -31,7 +31,7 @@ export class ReservationsService {
     });
 
     if (overlapping) {
-      throw new ConflictException('Reservation overlaps with an existing one');
+      throw new ConflictException('Conflito de horário: a sala já está reservada neste período');
     }
   }
 
@@ -69,11 +69,11 @@ export class ReservationsService {
   async update(id: string, userId: string, data: any) {
     const reservation = await this.prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException('Reserva não encontrada');
     }
     
     if (reservation.userId !== userId) {
-      throw new ForbiddenException('You can only update your own reservations');
+      throw new ForbiddenException('Você só pode atualizar suas próprias reservas');
     }
 
     const startTime = data.startTime ? new Date(data.startTime) : reservation.startTime;
@@ -98,11 +98,11 @@ export class ReservationsService {
   async remove(id: string, userId: string) {
     const reservation = await this.prisma.reservation.findUnique({ where: { id } });
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException('Reserva não encontrada');
     }
     
     if (reservation.userId !== userId) {
-      throw new ForbiddenException('You can only delete your own reservations');
+      throw new ForbiddenException('Você só pode excluir suas próprias reservas');
     }
 
     return this.prisma.reservation.delete({
