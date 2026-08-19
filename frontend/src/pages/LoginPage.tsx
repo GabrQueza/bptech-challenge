@@ -50,7 +50,7 @@ export const LoginPage = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to login',
+        description: error.response?.data?.message || 'Erro de conexão',
         status: 'error',
         duration: 3000,
         isClosable: true,

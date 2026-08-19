@@ -61,7 +61,7 @@ export const RegisterPage = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to create account',
+        description: error.response?.data?.message || 'Erro de conexão',
         status: 'error',
         duration: 3000,
         isClosable: true,
