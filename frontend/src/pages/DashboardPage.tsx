@@ -258,7 +258,6 @@ export const DashboardPage = () => {
                 locale={ptBR}
                 dateFormat="dd/MM/yyyy"
                 customInput={<Input placeholder="Filtrar por Data" w="full" />}
-                isClearable
                 placeholderText="Filtrar por Data"
               />
             </Box>
