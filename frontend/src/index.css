@@ -2,3 +2,8 @@
 body {
   background-color: #f7fafc; /* gray.50 */
 }
+
+/* Força o wrapper do react-datepicker a preencher todo o container Box do Chakra */
+.react-datepicker-wrapper {
+  width: 100%;
+}
