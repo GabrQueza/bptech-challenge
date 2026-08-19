@@ -38,6 +38,11 @@ import {
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
+import DatePicker from 'react-datepicker';
+import { ptBR } from 'date-fns/locale';
+import { format } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
+
 const pad = (n: number) => n.toString().padStart(2, '0');
 const toLocalYYYYMMDD = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
@@ -45,7 +50,7 @@ export const DashboardPage = () => {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const [filterDate, setFilterDate] = useState('');
+  const [filterDate, setFilterDate] = useState<Date | null>(null);
   const [filterRoom, setFilterRoom] = useState('');
   const [filterUser, setFilterUser] = useState('');
 
@@ -58,7 +63,7 @@ export const DashboardPage = () => {
   const [currentReservationId, setCurrentReservationId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     roomId: '',
-    date: '',
+    date: null as Date | null,
     startTime: '',
     endTime: ''
   });
@@ -98,7 +103,7 @@ export const DashboardPage = () => {
   const handleOpenCreate = () => {
     setIsEditing(false);
     setCurrentReservationId(null);
-    setFormData({ roomId: '', date: '', startTime: '', endTime: '' });
+    setFormData({ roomId: '', date: null, startTime: '', endTime: '' });
     onOpen();
   };
 
@@ -113,7 +118,7 @@ export const DashboardPage = () => {
     
     setFormData({
       roomId: res.roomId,
-      date: toLocalYYYYMMDD(dObj),
+      date: dObj,
       startTime: `${pad(sObj.getHours())}:${pad(sObj.getMinutes())}`,
       endTime: `${pad(eObj.getHours())}:${pad(eObj.getMinutes())}`,
     });
@@ -122,13 +127,19 @@ export const DashboardPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.date) {
+      toast({ title: 'Erro', description: 'Por favor, selecione uma data válida.', status: 'error', duration: 3000, isClosable: true });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      const dateStr = format(formData.date, 'yyyy-MM-dd');
       const payload = {
         roomId: formData.roomId,
-        date: new Date(`${formData.date}T00:00:00`).toISOString(),
-        startTime: new Date(`${formData.date}T${formData.startTime}:00`).toISOString(),
-        endTime: new Date(`${formData.date}T${formData.endTime}:00`).toISOString(),
+        date: new Date(`${dateStr}T00:00:00`).toISOString(),
+        startTime: new Date(`${dateStr}T${formData.startTime}:00`).toISOString(),
+        endTime: new Date(`${dateStr}T${formData.endTime}:00`).toISOString(),
       };
 
       if (isEditing && currentReservationId) {
@@ -183,7 +194,8 @@ export const DashboardPage = () => {
 
   const filteredReservations = reservations.filter((res) => {
     const localDateStr = toLocalYYYYMMDD(new Date(res.date)); 
-    const matchDate = filterDate ? localDateStr === filterDate : true;
+    const filterDateStr = filterDate ? format(filterDate, 'yyyy-MM-dd') : '';
+    const matchDate = filterDateStr ? localDateStr === filterDateStr : true;
     
     const safeRoomId = res.roomId ? String(res.roomId).toLowerCase() : '';
     const matchRoom = filterRoom ? safeRoomId === filterRoom.toLowerCase() : true;
@@ -195,7 +207,7 @@ export const DashboardPage = () => {
   });
 
   const handleResetFilters = () => {
-    setFilterDate('');
+    setFilterDate(null);
     setFilterRoom('');
     setFilterUser('');
   };
@@ -239,16 +251,22 @@ export const DashboardPage = () => {
             </Button>
           </Flex>
           <Stack direction={{ base: 'column', md: 'row' }} spacing={4} w="100%">
-            <Input 
-              type="date" 
-              placeholder="Filtrar por Data" 
-              value={filterDate} 
-              onChange={(e) => setFilterDate(e.target.value)}
-            />
+            <Box w="full">
+              <DatePicker 
+                selected={filterDate}
+                onChange={(date: Date | null) => setFilterDate(date)}
+                locale={ptBR}
+                dateFormat="dd/MM/yyyy"
+                customInput={<Input placeholder="Filtrar por Data" w="full" />}
+                isClearable
+                placeholderText="Filtrar por Data"
+              />
+            </Box>
             <Select 
               placeholder="Selecionar Sala" 
               value={filterRoom} 
               onChange={(e) => setFilterRoom(e.target.value)}
+              w="full"
             >
               <option value="sala-a">sala-a</option>
               <option value="sala-b">sala-b</option>
@@ -258,6 +276,7 @@ export const DashboardPage = () => {
               placeholder="Filtrar por Nome de Usuário" 
               value={filterUser} 
               onChange={(e) => setFilterUser(e.target.value)}
+              w="full"
             />
           </Stack>
         </VStack>
@@ -343,11 +362,15 @@ export const DashboardPage = () => {
               </FormControl>
               <FormControl isRequired>
                 <FormLabel>Data</FormLabel>
-                <Input 
-                  type="date" 
-                  value={formData.date} 
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
-                />
+                <Box w="full">
+                  <DatePicker 
+                    selected={formData.date}
+                    onChange={(date: Date | null) => setFormData({ ...formData, date })}
+                    locale={ptBR}
+                    dateFormat="dd/MM/yyyy"
+                    customInput={<Input placeholder="Selecione uma data" w="full" />}
+                  />
+                </Box>
               </FormControl>
               <HStack w="full">
                 <FormControl isRequired>
