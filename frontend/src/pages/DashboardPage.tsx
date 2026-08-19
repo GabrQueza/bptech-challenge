@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Container,
@@ -26,9 +26,13 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
+  Select,
 } from '@chakra-ui/react';
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+
+const pad = (n: number) => n.toString().padStart(2, '0');
+const toLocalYYYYMMDD = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 export const DashboardPage = () => {
   const [reservations, setReservations] = useState<any[]>([]);
@@ -90,16 +94,16 @@ export const DashboardPage = () => {
     setIsEditing(true);
     setCurrentReservationId(res.id);
     
-    // Convert backend dates to local time strings
+    // Convert backend dates to local time strings safely
     const dObj = new Date(res.date);
     const sObj = new Date(res.startTime);
     const eObj = new Date(res.endTime);
     
     setFormData({
       roomId: res.roomId,
-      date: dObj.toISOString().split('T')[0],
-      startTime: sObj.toTimeString().slice(0, 5),
-      endTime: eObj.toTimeString().slice(0, 5),
+      date: toLocalYYYYMMDD(dObj),
+      startTime: `${pad(sObj.getHours())}:${pad(sObj.getMinutes())}`,
+      endTime: `${pad(eObj.getHours())}:${pad(eObj.getMinutes())}`,
     });
     onOpen();
   };
@@ -110,7 +114,7 @@ export const DashboardPage = () => {
     try {
       const payload = {
         roomId: formData.roomId,
-        date: new Date(formData.date).toISOString(),
+        date: new Date(`${formData.date}T00:00:00`).toISOString(),
         startTime: new Date(`${formData.date}T${formData.startTime}:00`).toISOString(),
         endTime: new Date(`${formData.date}T${formData.endTime}:00`).toISOString(),
       };
@@ -139,20 +143,23 @@ export const DashboardPage = () => {
   };
 
   const filteredReservations = reservations.filter((res) => {
-    // Para a data, vamos converter a data do banco (UTC) para o fuso local em formato YYYY-MM-DD (en-CA).
-    // Assim, se o display mostra 8/24, o filtro também vai bater com 8/24.
-    const localDateStr = new Date(res.date).toLocaleDateString('en-CA'); 
+    const localDateStr = toLocalYYYYMMDD(new Date(res.date)); 
     const matchDate = filterDate ? localDateStr === filterDate : true;
     
-    // Tratamento ultra-seguro para strings
     const safeRoomId = res.roomId ? String(res.roomId).toLowerCase() : '';
-    const matchRoom = filterRoom ? safeRoomId.includes(filterRoom.toLowerCase()) : true;
+    const matchRoom = filterRoom ? safeRoomId === filterRoom.toLowerCase() : true;
     
     const safeUserName = res.user?.name ? String(res.user.name).toLowerCase() : String(res.userId || '').toLowerCase();
     const matchUser = filterUser ? safeUserName.includes(filterUser.toLowerCase()) : true;
     
     return matchDate && matchRoom && matchUser;
   });
+
+  const handleResetFilters = () => {
+    setFilterDate('');
+    setFilterRoom('');
+    setFilterUser('');
+  };
 
   return (
     <Container maxW="container.xl" py={10}>
@@ -166,7 +173,10 @@ export const DashboardPage = () => {
 
       <Box p={6} borderWidth={1} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
-          <Text fontWeight="bold">Filters</Text>
+          <Flex justifyContent="space-between" alignItems="center">
+            <Text fontWeight="bold">Filters</Text>
+            <Button size="sm" onClick={handleResetFilters}>Reset Filters</Button>
+          </Flex>
           <HStack spacing={4}>
             <Input 
               type="date" 
@@ -174,11 +184,15 @@ export const DashboardPage = () => {
               value={filterDate} 
               onChange={(e) => setFilterDate(e.target.value)}
             />
-            <Input 
-              placeholder="Filter by Room ID" 
+            <Select 
+              placeholder="Select Room" 
               value={filterRoom} 
               onChange={(e) => setFilterRoom(e.target.value)}
-            />
+            >
+              <option value="sala-a">sala-a</option>
+              <option value="sala-b">sala-b</option>
+              <option value="sala-c">sala-c</option>
+            </Select>
             <Input 
               placeholder="Filter by User Name" 
               value={filterUser} 
@@ -212,10 +226,10 @@ export const DashboardPage = () => {
             ) : (
               filteredReservations.map((res) => (
                 <Tr key={res.id}>
-                  <Td>{new Date(res.date).toLocaleDateString()}</Td>
+                  <Td>{new Date(res.date).toLocaleDateString('pt-BR')}</Td>
                   <Td>{res.roomId}</Td>
-                  <Td>{new Date(res.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Td>
-                  <Td>{new Date(res.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Td>
+                  <Td>{new Date(res.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Td>
+                  <Td>{new Date(res.endTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Td>
                   <Td>{res.user?.name || res.userId}</Td>
                   <Td>
                     <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
@@ -239,11 +253,15 @@ export const DashboardPage = () => {
             <VStack spacing={4}>
               <FormControl isRequired>
                 <FormLabel>Room ID</FormLabel>
-                <Input 
-                  placeholder="e.g. sala-a" 
+                <Select 
+                  placeholder="Select a room" 
                   value={formData.roomId} 
-                  onChange={(e) => setFormData({ ...formData, roomId: e.target.value })} 
-                />
+                  onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
+                >
+                  <option value="sala-a">sala-a</option>
+                  <option value="sala-b">sala-b</option>
+                  <option value="sala-c">sala-c</option>
+                </Select>
               </FormControl>
               <FormControl isRequired>
                 <FormLabel>Date</FormLabel>
