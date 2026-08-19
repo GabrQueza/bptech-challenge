@@ -1,17 +1,53 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ReservationsService {
   constructor(private prisma: PrismaService) {}
 
+  private async validateReservation(startTime: Date, endTime: Date, roomId: string, excludeId?: string) {
+    const now = new Date();
+    
+    // 1. Não pode ocorrer no passado
+    if (startTime < now) {
+      throw new BadRequestException('Reservation cannot be in the past');
+    }
+
+    // 2. Duração mínima de 1 hora
+    const durationMs = endTime.getTime() - startTime.getTime();
+    const oneHourMs = 60 * 60 * 1000;
+    if (durationMs < oneHourMs) {
+      throw new BadRequestException('Reservation must be at least 1 hour long');
+    }
+
+    // 3. Checar sobreposição de horários
+    const overlapping = await this.prisma.reservation.findFirst({
+      where: {
+        roomId,
+        id: excludeId ? { not: excludeId } : undefined,
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+    });
+
+    if (overlapping) {
+      throw new ConflictException('Reservation overlaps with an existing one');
+    }
+  }
+
   async create(userId: string, data: any) {
+    const startTime = new Date(data.startTime);
+    const endTime = new Date(data.endTime);
+    const date = new Date(data.date);
+
+    await this.validateReservation(startTime, endTime, data.roomId);
+
     return this.prisma.reservation.create({
       data: {
         ...data,
-        date: new Date(data.date),
-        startTime: new Date(data.startTime),
-        endTime: new Date(data.endTime),
+        date,
+        startTime,
+        endTime,
         userId,
       },
     });
@@ -38,6 +74,14 @@ export class ReservationsService {
     
     if (reservation.userId !== userId) {
       throw new ForbiddenException('You can only update your own reservations');
+    }
+
+    const startTime = data.startTime ? new Date(data.startTime) : reservation.startTime;
+    const endTime = data.endTime ? new Date(data.endTime) : reservation.endTime;
+    const roomId = data.roomId || reservation.roomId;
+
+    if (data.startTime || data.endTime || data.roomId) {
+      await this.validateReservation(startTime, endTime, roomId, id);
     }
     
     return this.prisma.reservation.update({
