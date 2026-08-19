@@ -53,7 +53,7 @@ export const LoginPage = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Erro de conexão',
+        description: error.response?.data?.message || 'Connection error',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -65,9 +65,9 @@ export const LoginPage = () => {
 
   return (
     <Container centerContent py={10}>
-      <Box w="full" maxW="md" p={8} borderWidth={1} borderRadius="lg" boxShadow="lg">
+      <Box w="full" maxW="md" p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white">
         <VStack spacing={4} align="stretch" as="form" onSubmit={handleLogin}>
-          <Heading textAlign="center" size="lg">Login</Heading>
+          <Heading textAlign="center" size="lg" color="blue.600">Login</Heading>
           
           <FormControl isRequired>
             <FormLabel>Email</FormLabel>
@@ -89,7 +89,15 @@ export const LoginPage = () => {
             />
           </FormControl>
           
-          <Button colorScheme="blue" size="lg" type="submit" mt={4} isLoading={isLoading}>
+          <Button 
+            colorScheme="blue" 
+            size="lg" 
+            type="submit" 
+            mt={4} 
+            isLoading={isLoading}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
             Sign In
           </Button>
           

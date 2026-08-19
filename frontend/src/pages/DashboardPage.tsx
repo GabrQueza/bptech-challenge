@@ -202,18 +202,39 @@ export const DashboardPage = () => {
   return (
     <Container maxW="container.xl" py={10}>
       <Flex justifyContent="space-between" alignItems="center" mb={8}>
-        <Heading>Reservations Dashboard</Heading>
+        <Heading color="blue.600">Reservations Dashboard</Heading>
         <HStack>
-          <Button colorScheme="green" onClick={handleOpenCreate}>New Reservation</Button>
-          <Button colorScheme="red" onClick={handleLogout}>Logout</Button>
+          <Button 
+            colorScheme="green" 
+            onClick={handleOpenCreate}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
+            New Reservation
+          </Button>
+          <Button 
+            colorScheme="red" 
+            onClick={handleLogout}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
+            Logout
+          </Button>
         </HStack>
       </Flex>
 
-      <Box p={6} borderWidth={1} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
+      <Box p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
           <Flex justifyContent="space-between" alignItems="center">
-            <Text fontWeight="bold">Filters</Text>
-            <Button size="sm" onClick={handleResetFilters}>Reset Filters</Button>
+            <Text fontWeight="bold" color="gray.700">Filters</Text>
+            <Button 
+              size="sm" 
+              onClick={handleResetFilters}
+              _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+              transition="all 0.2s"
+            >
+              Reset Filters
+            </Button>
           </Flex>
           <HStack spacing={4}>
             <Input 
@@ -240,7 +261,7 @@ export const DashboardPage = () => {
         </VStack>
       </Box>
 
-      <Box overflowX="auto" borderWidth={1} borderRadius="lg" boxShadow="md" bg="white">
+      <Box overflowX="auto" borderWidth={1} borderRadius="md" boxShadow="sm" bg="white" p={6}>
         <Table variant="simple">
           <Thead bg="gray.50">
             <Tr>
@@ -271,10 +292,22 @@ export const DashboardPage = () => {
                   <Td>{res.user?.name || res.userId}</Td>
                   <Td>
                     <HStack spacing={2}>
-                      <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
+                      <Button 
+                        size="sm" 
+                        colorScheme="blue" 
+                        onClick={() => handleOpenEdit(res)}
+                        _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                        transition="all 0.2s"
+                      >
                         Edit
                       </Button>
-                      <Button size="sm" colorScheme="red" onClick={() => confirmDelete(res.id)}>
+                      <Button 
+                        size="sm" 
+                        colorScheme="red" 
+                        onClick={() => confirmDelete(res.id)}
+                        _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                        transition="all 0.2s"
+                      >
                         Delete
                       </Button>
                     </HStack>
@@ -335,8 +368,16 @@ export const DashboardPage = () => {
             </VStack>
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>Cancel</Button>
-            <Button colorScheme="blue" type="submit" isLoading={isSubmitting}>
+            <Button variant="ghost" mr={3} onClick={onClose} _hover={{ bg: 'gray.100' }}>
+              Cancel
+            </Button>
+            <Button 
+              colorScheme="blue" 
+              type="submit" 
+              isLoading={isSubmitting}
+              _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+              transition="all 0.2s"
+            >
               Save
             </Button>
           </ModalFooter>
@@ -360,10 +401,17 @@ export const DashboardPage = () => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onDeleteClose}>
+              <Button ref={cancelRef} onClick={onDeleteClose} _hover={{ bg: 'gray.100' }}>
                 No, keep it
               </Button>
-              <Button colorScheme="red" onClick={executeDelete} ml={3} isLoading={isSubmitting}>
+              <Button 
+                colorScheme="red" 
+                onClick={executeDelete} 
+                ml={3} 
+                isLoading={isSubmitting}
+                _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+                transition="all 0.2s"
+              >
                 Yes, cancel it
               </Button>
             </AlertDialogFooter>

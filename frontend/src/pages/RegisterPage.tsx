@@ -63,7 +63,7 @@ export const RegisterPage = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Erro de conexão',
+        description: error.response?.data?.message || 'Connection error',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -75,9 +75,9 @@ export const RegisterPage = () => {
 
   return (
     <Container centerContent py={10}>
-      <Box w="full" maxW="md" p={8} borderWidth={1} borderRadius="lg" boxShadow="lg">
+      <Box w="full" maxW="md" p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white">
         <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
-          <Heading textAlign="center" size="lg">Register</Heading>
+          <Heading textAlign="center" size="lg" color="blue.600">Register</Heading>
           
           <FormControl isRequired>
             <FormLabel>Name</FormLabel>
@@ -109,7 +109,15 @@ export const RegisterPage = () => {
             />
           </FormControl>
           
-          <Button colorScheme="blue" size="lg" type="submit" mt={4} isLoading={isLoading}>
+          <Button 
+            colorScheme="blue" 
+            size="lg" 
+            type="submit" 
+            mt={4} 
+            isLoading={isLoading}
+            _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
+            transition="all 0.2s"
+          >
             Sign Up
           </Button>
           
