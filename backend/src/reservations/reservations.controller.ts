@@ -9,7 +9,7 @@ export class ReservationsController {
 
   @Post()
   create(@Request() req, @Body() createReservationDto: any) {
-    return this.reservationsService.create(req.user.sub, createReservationDto);
+    return this.reservationsService.create(req.user.userId, createReservationDto);
   }
 
   @Get()
@@ -19,16 +19,16 @@ export class ReservationsController {
 
   @Get('me')
   findMyReservations(@Request() req) {
-    return this.reservationsService.findByUserId(req.user.sub);
+    return this.reservationsService.findByUserId(req.user.userId);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Request() req, @Body() updateReservationDto: any) {
-    return this.reservationsService.update(id, req.user.sub, updateReservationDto);
+    return this.reservationsService.update(id, req.user.userId, updateReservationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
-    return this.reservationsService.remove(id, req.user.sub);
+    return this.reservationsService.remove(id, req.user.userId);
   }
 }
