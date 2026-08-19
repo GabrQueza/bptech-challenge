@@ -27,8 +27,8 @@ export const RegisterPage = () => {
     e.preventDefault();
     if (!name || !email || !password) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all fields.',
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -38,8 +38,8 @@ export const RegisterPage = () => {
 
     if (password.length < 6) {
       toast({
-        title: 'Error',
-        description: 'Password must be at least 6 characters.',
+        title: 'Erro',
+        description: 'A senha deve ter pelo menos 6 caracteres.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -53,8 +53,8 @@ export const RegisterPage = () => {
       console.log('✅ Account created successfully!', response.data);
       
       toast({
-        title: 'Success',
-        description: 'Account created successfully!',
+        title: 'Sucesso',
+        description: 'Conta criada com sucesso!',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -62,8 +62,8 @@ export const RegisterPage = () => {
       navigate('/login');
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Connection error',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro de conexão',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -78,33 +78,33 @@ export const RegisterPage = () => {
       <Container centerContent>
         <Box w="full" maxW="md" p={8} borderRadius="lg" boxShadow="md" bg="white">
           <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
-            <Heading textAlign="center" size="lg" color="blue.900">Register</Heading>
+            <Heading textAlign="center" size="lg" color="blue.900">Cadastrar</Heading>
           
           <FormControl isRequired>
-            <FormLabel>Name</FormLabel>
+            <FormLabel>Nome</FormLabel>
             <Input 
               type="text" 
-              placeholder="Enter your name" 
+              placeholder="Digite seu nome" 
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>E-mail</FormLabel>
             <Input 
               type="email" 
-              placeholder="Enter your email" 
+              placeholder="Digite seu e-mail" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
           
           <FormControl isRequired>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>Senha</FormLabel>
             <Input 
               type="password" 
-              placeholder="Enter your password" 
+              placeholder="Digite sua senha" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -119,13 +119,13 @@ export const RegisterPage = () => {
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
             transition="all 0.2s"
           >
-            Sign Up
+            Cadastrar
           </Button>
           
           <Text textAlign="center">
-            Already have an account?{' '}
+            Já tem uma conta?{' '}
             <Link as={RouterLink} to="/login" color="blue.500">
-              Login here
+              Entre aqui
             </Link>
           </Text>
         </VStack>

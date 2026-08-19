@@ -75,7 +75,7 @@ export const DashboardPage = () => {
       setReservations(response.data);
     } catch (error) {
       toast({
-        title: 'Error fetching reservations',
+        title: 'Erro ao buscar reservas',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -132,18 +132,18 @@ export const DashboardPage = () => {
 
       if (isEditing && currentReservationId) {
         await api.patch(`/reservations/${currentReservationId}`, payload);
-        toast({ title: 'Success', description: 'Reservation updated!', status: 'success', duration: 3000, isClosable: true });
+        toast({ title: 'Sucesso', description: 'Reserva atualizada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       } else {
         await api.post('/reservations', payload);
-        toast({ title: 'Success', description: 'Reservation created!', status: 'success', duration: 3000, isClosable: true });
+        toast({ title: 'Sucesso', description: 'Reserva criada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       }
       
       onClose();
       fetchReservations();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Error saving reservation',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro ao salvar reserva',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -163,13 +163,13 @@ export const DashboardPage = () => {
     setIsSubmitting(true);
     try {
       await api.delete(`/reservations/${reservationToDelete}`);
-      toast({ title: 'Success', description: 'Reservation cancelled!', status: 'success', duration: 3000, isClosable: true });
+      toast({ title: 'Sucesso', description: 'Reserva cancelada com sucesso!', status: 'success', duration: 3000, isClosable: true });
       fetchReservations();
       onDeleteClose();
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Error deleting reservation',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro ao excluir reserva',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -203,7 +203,7 @@ export const DashboardPage = () => {
     <Box minH="100vh" bg="gray.50" py={10}>
       <Container maxW="container.xl">
         <Flex justifyContent="space-between" alignItems="center" mb={8}>
-          <Heading color="blue.900">Reservations Dashboard</Heading>
+          <Heading color="blue.900">Painel de Reservas</Heading>
         <HStack>
           <Button 
             colorScheme="green" 
@@ -211,7 +211,7 @@ export const DashboardPage = () => {
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
             transition="all 0.2s"
           >
-            New Reservation
+            Nova Reserva
           </Button>
           <Button 
             colorScheme="red" 
@@ -219,7 +219,7 @@ export const DashboardPage = () => {
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
             transition="all 0.2s"
           >
-            Logout
+            Sair
           </Button>
         </HStack>
       </Flex>
@@ -227,25 +227,25 @@ export const DashboardPage = () => {
       <Box p={6} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
           <Flex justifyContent="space-between" alignItems="center">
-            <Text fontWeight="bold" color="gray.700">Filters</Text>
+            <Text fontWeight="bold" color="gray.700">Filtros</Text>
             <Button 
               size="sm" 
               onClick={handleResetFilters}
               _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
               transition="all 0.2s"
             >
-              Reset Filters
+              Limpar Filtros
             </Button>
           </Flex>
           <HStack spacing={4}>
             <Input 
               type="date" 
-              placeholder="Filter by Date" 
+              placeholder="Filtrar por Data" 
               value={filterDate} 
               onChange={(e) => setFilterDate(e.target.value)}
             />
             <Select 
-              placeholder="Select Room" 
+              placeholder="Selecionar Sala" 
               value={filterRoom} 
               onChange={(e) => setFilterRoom(e.target.value)}
             >
@@ -254,7 +254,7 @@ export const DashboardPage = () => {
               <option value="sala-c">sala-c</option>
             </Select>
             <Input 
-              placeholder="Filter by User Name" 
+              placeholder="Filtrar por Nome de Usuário" 
               value={filterUser} 
               onChange={(e) => setFilterUser(e.target.value)}
             />
@@ -266,22 +266,22 @@ export const DashboardPage = () => {
         <Table variant="simple">
           <Thead bg="gray.50">
             <Tr>
-              <Th>Date</Th>
-              <Th>Room</Th>
-              <Th>Start Time</Th>
-              <Th>End Time</Th>
-              <Th>User</Th>
-              <Th>Actions</Th>
+              <Th>Data</Th>
+              <Th>Sala</Th>
+              <Th>Início</Th>
+              <Th>Término</Th>
+              <Th>Usuário</Th>
+              <Th>Ações</Th>
             </Tr>
           </Thead>
           <Tbody>
             {isLoading ? (
               <Tr>
-                <Td colSpan={6} textAlign="center">Loading...</Td>
+                <Td colSpan={6} textAlign="center">Carregando...</Td>
               </Tr>
             ) : filteredReservations.length === 0 ? (
               <Tr>
-                <Td colSpan={6} textAlign="center">No reservations found.</Td>
+                <Td colSpan={6} textAlign="center">Nenhuma reserva encontrada.</Td>
               </Tr>
             ) : (
               filteredReservations.map((res) => (
@@ -300,7 +300,7 @@ export const DashboardPage = () => {
                         _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
                         transition="all 0.2s"
                       >
-                        Edit
+                        Editar
                       </Button>
                       <Button 
                         size="sm" 
@@ -309,7 +309,7 @@ export const DashboardPage = () => {
                         _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
                         transition="all 0.2s"
                       >
-                        Delete
+                        Excluir
                       </Button>
                     </HStack>
                   </Td>
@@ -324,14 +324,14 @@ export const DashboardPage = () => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit}>
-          <ModalHeader>{isEditing ? 'Edit Reservation' : 'New Reservation'}</ModalHeader>
+          <ModalHeader>{isEditing ? 'Editar Reserva' : 'Nova Reserva'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel>Room ID</FormLabel>
+                <FormLabel>Sala</FormLabel>
                 <Select 
-                  placeholder="Select a room" 
+                  placeholder="Selecione uma sala" 
                   value={formData.roomId} 
                   onChange={(e) => setFormData({ ...formData, roomId: e.target.value })}
                 >
@@ -341,7 +341,7 @@ export const DashboardPage = () => {
                 </Select>
               </FormControl>
               <FormControl isRequired>
-                <FormLabel>Date</FormLabel>
+                <FormLabel>Data</FormLabel>
                 <Input 
                   type="date" 
                   value={formData.date} 
@@ -350,7 +350,7 @@ export const DashboardPage = () => {
               </FormControl>
               <HStack w="full">
                 <FormControl isRequired>
-                  <FormLabel>Start Time</FormLabel>
+                  <FormLabel>Horário de Início</FormLabel>
                   <Input 
                     type="time" 
                     value={formData.startTime} 
@@ -358,7 +358,7 @@ export const DashboardPage = () => {
                   />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel>End Time</FormLabel>
+                  <FormLabel>Horário de Término</FormLabel>
                   <Input 
                     type="time" 
                     value={formData.endTime} 
@@ -370,7 +370,7 @@ export const DashboardPage = () => {
           </ModalBody>
           <ModalFooter>
             <Button variant="ghost" mr={3} onClick={onClose} _hover={{ bg: 'gray.100' }}>
-              Cancel
+              Cancelar
             </Button>
             <Button 
               colorScheme="blue" 
@@ -379,7 +379,7 @@ export const DashboardPage = () => {
               _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
               transition="all 0.2s"
             >
-              Save
+              Salvar
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -394,16 +394,16 @@ export const DashboardPage = () => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Cancel Reservation
+              Cancelar Reserva
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Are you sure? You can't undo this action afterwards.
+              Tem certeza? Esta ação não pode ser desfeita.
             </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onDeleteClose} _hover={{ bg: 'gray.100' }}>
-                No, keep it
+                Não, manter
               </Button>
               <Button 
                 colorScheme="red" 
@@ -413,7 +413,7 @@ export const DashboardPage = () => {
                 _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
                 transition="all 0.2s"
               >
-                Yes, cancel it
+                Sim, cancelar
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

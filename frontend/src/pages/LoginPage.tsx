@@ -26,8 +26,8 @@ export const LoginPage = () => {
     e.preventDefault();
     if (!email || !password) {
       toast({
-        title: 'Error',
-        description: 'Please fill in all fields.',
+        title: 'Erro',
+        description: 'Por favor, preencha todos os campos.',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -43,8 +43,8 @@ export const LoginPage = () => {
       console.log('✅ Login successful! Token received:', token);
       
       toast({
-        title: 'Success',
-        description: 'Logged in successfully!',
+        title: 'Sucesso',
+        description: 'Login realizado com sucesso!',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -52,8 +52,8 @@ export const LoginPage = () => {
       navigate('/');
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.response?.data?.message || 'Connection error',
+        title: 'Erro',
+        description: error.response?.data?.message || 'Erro de conexão',
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -68,23 +68,23 @@ export const LoginPage = () => {
       <Container centerContent>
         <Box w="full" maxW="md" p={8} borderRadius="lg" boxShadow="md" bg="white">
           <VStack spacing={4} align="stretch" as="form" onSubmit={handleLogin}>
-            <Heading textAlign="center" size="lg" color="blue.900">Login</Heading>
+            <Heading textAlign="center" size="lg" color="blue.900">Entrar</Heading>
           
           <FormControl isRequired>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>E-mail</FormLabel>
             <Input 
               type="email" 
-              placeholder="Enter your email" 
+              placeholder="Digite seu e-mail" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
           
           <FormControl isRequired>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>Senha</FormLabel>
             <Input 
               type="password" 
-              placeholder="Enter your password" 
+              placeholder="Digite sua senha" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -99,13 +99,13 @@ export const LoginPage = () => {
             _hover={{ transform: 'translateY(-2px)', boxShadow: 'md' }}
             transition="all 0.2s"
           >
-            Sign In
+            Entrar
           </Button>
           
           <Text textAlign="center">
-            Don't have an account?{' '}
+            Não tem uma conta?{' '}
             <Link as={RouterLink} to="/register" color="blue.500">
-              Register here
+              Registre-se aqui
             </Link>
           </Text>
         </VStack>
