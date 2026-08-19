@@ -200,9 +200,10 @@ export const DashboardPage = () => {
   };
 
   return (
-    <Container maxW="container.xl" py={10}>
-      <Flex justifyContent="space-between" alignItems="center" mb={8}>
-        <Heading color="blue.600">Reservations Dashboard</Heading>
+    <Box minH="100vh" bg="gray.50" py={10}>
+      <Container maxW="container.xl">
+        <Flex justifyContent="space-between" alignItems="center" mb={8}>
+          <Heading color="blue.900">Reservations Dashboard</Heading>
         <HStack>
           <Button 
             colorScheme="green" 
@@ -223,7 +224,7 @@ export const DashboardPage = () => {
         </HStack>
       </Flex>
 
-      <Box p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white" mb={6}>
+      <Box p={6} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
           <Flex justifyContent="space-between" alignItems="center">
             <Text fontWeight="bold" color="gray.700">Filters</Text>
@@ -261,7 +262,7 @@ export const DashboardPage = () => {
         </VStack>
       </Box>
 
-      <Box overflowX="auto" borderWidth={1} borderRadius="md" boxShadow="sm" bg="white" p={6}>
+      <Box overflowX="auto" borderRadius="lg" boxShadow="md" bg="white" p={6}>
         <Table variant="simple">
           <Thead bg="gray.50">
             <Tr>
@@ -419,6 +420,7 @@ export const DashboardPage = () => {
         </AlertDialogOverlay>
       </AlertDialog>
 
-    </Container>
+      </Container>
+    </Box>
   );
 };

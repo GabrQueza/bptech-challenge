@@ -74,10 +74,11 @@ export const RegisterPage = () => {
   };
 
   return (
-    <Container centerContent py={10}>
-      <Box w="full" maxW="md" p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white">
-        <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
-          <Heading textAlign="center" size="lg" color="blue.600">Register</Heading>
+    <Box minH="100vh" bg="gray.50" py={10}>
+      <Container centerContent>
+        <Box w="full" maxW="md" p={8} borderRadius="lg" boxShadow="md" bg="white">
+          <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
+            <Heading textAlign="center" size="lg" color="blue.900">Register</Heading>
           
           <FormControl isRequired>
             <FormLabel>Name</FormLabel>
@@ -128,7 +129,8 @@ export const RegisterPage = () => {
             </Link>
           </Text>
         </VStack>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </Box>
   );
 };

@@ -64,10 +64,11 @@ export const LoginPage = () => {
   };
 
   return (
-    <Container centerContent py={10}>
-      <Box w="full" maxW="md" p={6} borderWidth={1} borderRadius="md" boxShadow="sm" bg="white">
-        <VStack spacing={4} align="stretch" as="form" onSubmit={handleLogin}>
-          <Heading textAlign="center" size="lg" color="blue.600">Login</Heading>
+    <Box minH="100vh" bg="gray.50" py={10}>
+      <Container centerContent>
+        <Box w="full" maxW="md" p={8} borderRadius="lg" boxShadow="md" bg="white">
+          <VStack spacing={4} align="stretch" as="form" onSubmit={handleLogin}>
+            <Heading textAlign="center" size="lg" color="blue.900">Login</Heading>
           
           <FormControl isRequired>
             <FormLabel>Email</FormLabel>
@@ -108,7 +109,8 @@ export const LoginPage = () => {
             </Link>
           </Text>
         </VStack>
-      </Box>
-    </Container>
+        </Box>
+      </Container>
+    </Box>
   );
 };
