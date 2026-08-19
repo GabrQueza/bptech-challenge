@@ -15,5 +15,16 @@ model User {
   id       String @id @default(uuid())
   name     String
   email    String @unique
-  password String
+  password     String
+  reservations Reservation[]
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  date      DateTime
+  startTime DateTime
+  endTime   DateTime
+  roomId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
