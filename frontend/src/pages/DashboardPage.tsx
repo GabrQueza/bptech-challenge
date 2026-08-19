@@ -10,6 +10,7 @@ import {
   Th,
   Td,
   HStack,
+  Stack,
   Input,
   VStack,
   Button,
@@ -202,9 +203,9 @@ export const DashboardPage = () => {
   return (
     <Box minH="100vh" bg="gray.50" py={10}>
       <Container maxW="container.xl">
-        <Flex justifyContent="space-between" alignItems="center" mb={8}>
-          <Heading color="blue.900">Painel de Reservas</Heading>
-        <HStack>
+        <Flex direction={{ base: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" mb={8} gap={{ base: 4, md: 0 }}>
+          <Heading color="blue.900" textAlign={{ base: 'center', md: 'left' }}>Painel de Reservas</Heading>
+        <HStack w={{ base: '100%', md: 'auto' }} justifyContent={{ base: 'center', md: 'flex-start' }}>
           <Button 
             colorScheme="green" 
             onClick={handleOpenCreate}
@@ -224,7 +225,7 @@ export const DashboardPage = () => {
         </HStack>
       </Flex>
 
-      <Box p={6} borderRadius="lg" boxShadow="md" bg="white" mb={6}>
+      <Box p={6} borderRadius="xl" boxShadow="lg" bg="white" mb={6}>
         <VStack align="stretch" spacing={4}>
           <Flex justifyContent="space-between" alignItems="center">
             <Text fontWeight="bold" color="gray.700">Filtros</Text>
@@ -237,7 +238,7 @@ export const DashboardPage = () => {
               Limpar Filtros
             </Button>
           </Flex>
-          <HStack spacing={4}>
+          <Stack direction={{ base: 'column', md: 'row' }} spacing={4} w="100%">
             <Input 
               type="date" 
               placeholder="Filtrar por Data" 
@@ -258,11 +259,11 @@ export const DashboardPage = () => {
               value={filterUser} 
               onChange={(e) => setFilterUser(e.target.value)}
             />
-          </HStack>
+          </Stack>
         </VStack>
       </Box>
 
-      <Box overflowX="auto" borderRadius="lg" boxShadow="md" bg="white" p={6}>
+      <Box overflowX="auto" w="100%" borderRadius="xl" boxShadow="lg" bg="white" p={6}>
         <Table variant="simple">
           <Thead bg="gray.50">
             <Tr>

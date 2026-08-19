@@ -74,9 +74,9 @@ export const RegisterPage = () => {
   };
 
   return (
-    <Box minH="100vh" bg="gray.50" py={10}>
+    <Box minH="100vh" w="100%" bg="gray.50" py={10} px={4}>
       <Container centerContent>
-        <Box w="full" maxW="md" p={8} borderRadius="lg" boxShadow="md" bg="white">
+        <Box w="full" maxW="md" p={8} borderRadius="xl" boxShadow="lg" bg="white">
           <VStack spacing={4} align="stretch" as="form" onSubmit={handleRegister}>
             <Heading textAlign="center" size="lg" color="blue.900">Cadastrar</Heading>
           
