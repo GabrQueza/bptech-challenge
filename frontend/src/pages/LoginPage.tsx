@@ -13,14 +13,16 @@ import {
   Container,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       toast({
@@ -33,17 +35,29 @@ export const LoginPage = () => {
       return;
     }
     
-    // Simulate login for now
-    console.log('Login with', { email, password });
-    toast({
-      title: 'Success',
-      description: 'Logged in successfully!',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-    // Simular navegação para dashboard
-    setTimeout(() => navigate('/'), 1000);
+    setIsLoading(true);
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      localStorage.setItem('access_token', response.data.access_token);
+      toast({
+        title: 'Success',
+        description: 'Logged in successfully!',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to login',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,7 +86,7 @@ export const LoginPage = () => {
             />
           </FormControl>
           
-          <Button colorScheme="blue" size="lg" type="submit" mt={4}>
+          <Button colorScheme="blue" size="lg" type="submit" mt={4} isLoading={isLoading}>
             Sign In
           </Button>
           

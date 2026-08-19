@@ -13,15 +13,17 @@ import {
   Container,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 export const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) {
       toast({
@@ -45,16 +47,28 @@ export const RegisterPage = () => {
       return;
     }
     
-    // Simulate register for now
-    console.log('Register with', { name, email, password });
-    toast({
-      title: 'Success',
-      description: 'Account created successfully!',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-    navigate('/login');
+    setIsLoading(true);
+    try {
+      await api.post('/auth/register', { name, email, password });
+      toast({
+        title: 'Success',
+        description: 'Account created successfully!',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      navigate('/login');
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to create account',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,7 +107,7 @@ export const RegisterPage = () => {
             />
           </FormControl>
           
-          <Button colorScheme="blue" size="lg" type="submit" mt={4}>
+          <Button colorScheme="blue" size="lg" type="submit" mt={4} isLoading={isLoading}>
             Sign Up
           </Button>
           
