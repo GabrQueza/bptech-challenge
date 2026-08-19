@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Box,
   Container,
@@ -27,6 +27,12 @@ import {
   FormControl,
   FormLabel,
   Select,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from '@chakra-ui/react';
 import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -56,6 +62,11 @@ export const DashboardPage = () => {
     endTime: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Delete Dialog State
+  const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const [reservationToDelete, setReservationToDelete] = useState<string | null>(null);
 
   const fetchReservations = async () => {
     setIsLoading(true);
@@ -142,21 +153,30 @@ export const DashboardPage = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to cancel this reservation?')) {
-      try {
-        await api.delete(`/reservations/${id}`);
-        toast({ title: 'Success', description: 'Reservation cancelled!', status: 'success', duration: 3000, isClosable: true });
-        fetchReservations();
-      } catch (error: any) {
-        toast({
-          title: 'Error',
-          description: error.response?.data?.message || 'Error deleting reservation',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+  const confirmDelete = (id: string) => {
+    setReservationToDelete(id);
+    onDeleteOpen();
+  };
+
+  const executeDelete = async () => {
+    if (!reservationToDelete) return;
+    setIsSubmitting(true);
+    try {
+      await api.delete(`/reservations/${reservationToDelete}`);
+      toast({ title: 'Success', description: 'Reservation cancelled!', status: 'success', duration: 3000, isClosable: true });
+      fetchReservations();
+      onDeleteClose();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Error deleting reservation',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+      setReservationToDelete(null);
     }
   };
 
@@ -254,7 +274,7 @@ export const DashboardPage = () => {
                       <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
                         Edit
                       </Button>
-                      <Button size="sm" colorScheme="red" onClick={() => handleDelete(res.id)}>
+                      <Button size="sm" colorScheme="red" onClick={() => confirmDelete(res.id)}>
                         Delete
                       </Button>
                     </HStack>
@@ -322,6 +342,34 @@ export const DashboardPage = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Alert Dialog for Delete Confirmation */}
+      <AlertDialog
+        isOpen={isDeleteOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onDeleteClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Cancel Reservation
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure? You can't undo this action afterwards.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onDeleteClose}>
+                No, keep it
+              </Button>
+              <Button colorScheme="red" onClick={executeDelete} ml={3} isLoading={isSubmitting}>
+                Yes, cancel it
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
     </Container>
   );
