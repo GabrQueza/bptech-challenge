@@ -142,6 +142,24 @@ export const DashboardPage = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to cancel this reservation?')) {
+      try {
+        await api.delete(`/reservations/${id}`);
+        toast({ title: 'Success', description: 'Reservation cancelled!', status: 'success', duration: 3000, isClosable: true });
+        fetchReservations();
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: error.response?.data?.message || 'Error deleting reservation',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
   const filteredReservations = reservations.filter((res) => {
     const localDateStr = toLocalYYYYMMDD(new Date(res.date)); 
     const matchDate = filterDate ? localDateStr === filterDate : true;
@@ -232,9 +250,14 @@ export const DashboardPage = () => {
                   <Td>{new Date(res.endTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Td>
                   <Td>{res.user?.name || res.userId}</Td>
                   <Td>
-                    <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
-                      Edit
-                    </Button>
+                    <HStack spacing={2}>
+                      <Button size="sm" colorScheme="blue" onClick={() => handleOpenEdit(res)}>
+                        Edit
+                      </Button>
+                      <Button size="sm" colorScheme="red" onClick={() => handleDelete(res.id)}>
+                        Delete
+                      </Button>
+                    </HStack>
                   </Td>
                 </Tr>
               ))
