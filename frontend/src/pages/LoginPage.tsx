@@ -38,7 +38,10 @@ export const LoginPage = () => {
     setIsLoading(true);
     try {
       const response = await api.post('/auth/login', { email, password });
-      localStorage.setItem('access_token', response.data.access_token);
+      const token = response.data.access_token;
+      localStorage.setItem('access_token', token);
+      console.log('✅ Login successful! Token received:', token);
+      
       toast({
         title: 'Success',
         description: 'Logged in successfully!',

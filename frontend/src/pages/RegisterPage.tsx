@@ -49,7 +49,9 @@ export const RegisterPage = () => {
     
     setIsLoading(true);
     try {
-      await api.post('/auth/register', { name, email, password });
+      const response = await api.post('/auth/register', { name, email, password });
+      console.log('✅ Account created successfully!', response.data);
+      
       toast({
         title: 'Success',
         description: 'Account created successfully!',
